@@ -32,6 +32,7 @@ erDiagram
     float BuyPrice
     float SellPrice
     int NumberOfItems
+    string Category
   }
   Orders {
     int OrderID
@@ -44,19 +45,27 @@ erDiagram
   }
   Activity {
     int ActivityID
+    string ClientID
+    string ProductID
     string Properties
+    string ActivityType
     datetime CreatedAt
   }
   Audit {
     int AuditID
     int OrderID
-    datetime OrderDateTime
+    string Action
+    string OldValues
+    string NewValues
+    datetime CreatedAt
   }
   Notifications {
     int NotificationID
-    string Notification
-    datetime DateTime
     string ClientID
+    string Message
+    string Type
+    boolean IsRead
+    datetime CreatedAt
   }
 
   Clients ||--o{ Orders : places
@@ -64,8 +73,10 @@ erDiagram
   Employees ||--o{ Orders : processes
   Clients }o--|| Addresses : has
   Employees }o--|| Addresses : has
-  Orders ||--o{ Audit : triggers
-  Orders ||--o{ Audit : tracks
+  Orders ||--o{ Audit : tracked_in
   Clients ||--o{ Activity : performs
+  Products ||--o{ Activity : browsed
   Clients ||--o{ Notifications : receives
 ```
+
+
