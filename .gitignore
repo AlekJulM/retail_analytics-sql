@@ -1,0 +1,61 @@
+# Retail Analytics SQL Platform - .gitignore
+
+# Database data directories
+docker/data/
+docker/backups/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# MySQL specific
+*.pid
+*.sock
+
+# Backup files
+*.bak
+*.backup
+
+# Compressed files (except documentation)
+*.tar.gz
+*.zip
+!docs/*.zip
+
+# Node modules (if API is added later)
+node_modules/
+npm-debug.log*
+
+# Python files (if scripts are added later)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# Documentation build files
+docs/_build/
+docs/site/

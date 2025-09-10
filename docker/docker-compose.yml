@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: retail_analytics_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: retail_analytics_root_2024
+      MYSQL_DATABASE: retail_analytics
+      MYSQL_USER: retail_user
+      MYSQL_PASSWORD: retail_password_2024
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      # Mount SQL files for automatic execution
+      - ./sql/00_schema.sql:/docker-entrypoint-initdb.d/00_schema.sql
+      - ./sql/01_seed.sql:/docker-entrypoint-initdb.d/01_seed.sql
+      - ./sql/10_routines.sql:/docker-entrypoint-initdb.d/10_routines.sql
+      - ./sql/15_triggers.sql:/docker-entrypoint-initdb.d/15_triggers.sql
+      - ./sql/30_indexes.sql:/docker-entrypoint-initdb.d/30_indexes.sql
+      - ./sql/40_events.sql:/docker-entrypoint-initdb.d/40_events.sql
+      # Persistent data storage
+      - mysql_data:/var/lib/mysql
+      # MySQL configuration
+      - ./docker/mysql.cnf:/etc/mysql/conf.d/retail_analytics.cnf
+      # Backup directory
+      - ./docker/backups:/backups
+    networks:
+      - retail_network
+    command: --default-authentication-plugin=mysql_native_password --event-scheduler=ON
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "retail_user", "-pretail_password_2024"]
+      timeout: 20s
+      retries: 10
+      interval: 30s
+
+  # phpMyAdmin for database management
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2
+    container_name: retail_analytics_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: retail_user
+      PMA_PASSWORD: retail_password_2024
+      MYSQL_ROOT_PASSWORD: retail_analytics_root_2024
+      PMA_ARBITRARY: 1
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - retail_network
+
+  # MySQL Workbench alternative - Adminer
+  adminer:
+    image: adminer:4.8.1
+    container_name: retail_analytics_adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql
+    networks:
+      - retail_network
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+
+  # Backup service
+  mysql_backup:
+    image: mysql:8.0
+    container_name: retail_analytics_backup
+    restart: "no"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: retail_user
+      MYSQL_PASSWORD: retail_password_2024
+      MYSQL_DATABASE: retail_analytics
+    volumes:
+      - ./docker/backups:/backups
+      - ./docker/scripts:/scripts
+    networks:
+      - retail_network
+    depends_on:
+      - mysql
+    command: >
+      sh -c "
+        echo 'Backup service ready. Use: docker-compose exec mysql_backup /scripts/backup.sh'
+        tail -f /dev/null
+      "
+
+  # Analytics API (placeholder for future development)
+  # analytics_api:
+  #   build:
+  #     context: ./api
+  #     dockerfile: Dockerfile
+  #   container_name: retail_analytics_api
+  #   restart: unless-stopped
+  #   environment:
+  #     DB_HOST: mysql
+  #     DB_PORT: 3306
+  #     DB_NAME: retail_analytics
+  #     DB_USER: retail_user
+  #     DB_PASSWORD: retail_password_2024
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - mysql
+  #   networks:
+  #     - retail_network
+
+volumes:
+  mysql_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/docker/data
+      o: bind
+
+networks:
+  retail_network:
+    driver: bridge
+
+# Development overrides
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# for development environment with additional services and configurations

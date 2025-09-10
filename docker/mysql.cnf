@@ -1,0 +1,56 @@
+[mysql]
+default-character-set = utf8mb4
+
+[mysqld]
+# Character set and collation
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# Performance tuning
+innodb_buffer_pool_size = 1G
+innodb_log_file_size = 256M
+innodb_file_per_table = 1
+innodb_flush_method = O_DIRECT
+
+# Query cache (MySQL 5.7 and earlier)
+query_cache_type = 1
+query_cache_size = 64M
+
+# Event scheduler
+event_scheduler = ON
+
+# Binary logging
+log-bin = mysql-bin
+server-id = 1
+expire_logs_days = 7
+
+# Slow query log
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/mysql-slow.log
+long_query_time = 1
+
+# Error log
+log-error = /var/log/mysql/mysql-error.log
+
+# General query log (disable in production)
+# general_log = 1
+# general_log_file = /var/log/mysql/mysql-general.log
+
+# Connection settings
+max_connections = 200
+max_connect_errors = 100000
+
+# Timeout settings
+wait_timeout = 600
+interactive_timeout = 600
+
+# MyISAM settings
+key_buffer_size = 64M
+myisam_sort_buffer_size = 64M
+
+# InnoDB settings
+innodb_flush_log_at_trx_commit = 1
+innodb_lock_wait_timeout = 50
+
+# Security
+local-infile = 0
