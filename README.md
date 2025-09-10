@@ -36,7 +36,7 @@ Implements stored routines, optimized queries, JSON parsing, triggers, and commo
 
 ## 📊 Entity Relationship Diagram
 
-### Mermaid (editable)
+### Mermaid 
 ```mermaid
 erDiagram
   Clients {
